@@ -192,9 +192,10 @@ class HealthBot {
                 let reply = '';
                 if (error) {
                     console.log(error);
-                    reply = 'Sorry, I couldn\'t find any doctors near you.';
+                    reply = 'Sorry, I couldn\'t find the weather for that city.';
                 }
                 else {
+                    console.log(params.location);
                     reply = 'Here is what I found:\n';
                     for (var i=0; i<venues.response.venues.length; i++) {
                         if (reply.length > 0) {

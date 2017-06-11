@@ -12,7 +12,7 @@ require(['vue'], function(Vue) {
             messages: [],
             awaitingResponse: false,
             markdownConverter: new showdown.Converter(),
-            product: 0
+            product: ''
         },
         methods: {
             submitMessage: function() {
@@ -125,19 +125,10 @@ require(['vue'], function(Vue) {
                         var data = JSON.parse(evt.data);
                         // console.log('data .... ' + evt.data);
                         if (data.type == 'msg') {
-                            // console.log('Received message.');
-                            if (data.product) {
-                                app.product = data.product;
+                            console.log(data.products);
+                            if (data.products) {
+                                app.product = data.products;
                             }
-                            
-                            // var re = /invisible/gi;
-                            // if ( data.text.search(re) !== -1 ){
-                            //     var message = data.text.split('<hr>');
-                            //     // console.log(message[0]);
-                            //     data.text = message[0]
-                            //     data.watsonData = message[1]
-                            //     // console.log(message[1]);
-                            // }
                             app.addMessage({
                                 isBot: true,
                                 user: app.botName,

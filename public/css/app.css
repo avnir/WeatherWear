@@ -1,55 +1,109 @@
 html, body {
-	height: 100%;
-	padding: 0px;
-	margin: 0px;
-	overflow: hidden;
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden;
+  font-family: 'Bubbler One', sans-serif;
 }
 
+
+/*#app {
+  height: 100%;
+}*/
+
 #app {
-	height: 100%;
+  height: 100vh;
 }
 
 .chat-outer-container {
-	height: 100%;
-	position: relative;
+  height: 100%;
+  position: relative;
 }
 
 .chat-inner-container {
-	width: 100%;
-	position: absolute;
-	bottom: 0px;
-	left: 0px;
-	padding: 30px;
+  width: 100%;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  padding: 30px;
 }
 
 #chat-message-container {
-	overflow-y: scroll;
-	margin-bottom: 10px;
+  overflow-y: scroll;
+  margin-bottom: 10px;
 }
 
 .chat-msg-body-bot {
-	background-color: #eee;
-	color: black;
-	border-radius: 5px;
-	margin: 10px 50px 10px 0px;
-	padding: 5px 10px 5px 10px;
+  background-color: #eee;
+  color: black;
+  border-radius: 5px;
+  margin: 10px 50px 10px 0px;
+  padding: 5px 10px 5px 10px;
 }
 
 .chat-msg-body-user {
-	background-color: #34aadc;
-	color: white;
-	border-radius: 5px;
-	margin: 10px 0px 10px 50px;
-	padding: 5px 10px 5px 10px;
+  background-color: #34aadc;
+  color: white;
+  border-radius: 5px;
+  margin: 10px 0px 10px 50px;
+  padding: 5px 10px 5px 10px;
 }
 
 .editor-container {
-	height: 100%;
-	padding: 0px;
-	margin: 0px;
+  height: 100%;
+  width: 100% padding: 0px;
+  margin: 0px;
+  background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), url("https://i.ytimg.com/vi/v1SabYdIlZI/maxresdefault.jpg");
+  background-size: cover;
+  opacity: .5
+}
+
+span#logo {
+  font-family: 'Quicksand', sans-serif !important;
+  position: absolute;
+  z-index: 10;
+  font-size: 3em;
+  padding-left: .5em;
+  color: #068D9D
 }
 
 #editor {
-	height: 100%;
-	width: 100%;
+  height: 100%;
+  width: 100%;
+  display: none;
+}
+
+.degree {
+  color: black;
+  opacity: .8;
+  padding: 3em;
+}
+
+#city {
+  font-size: 7em;
+  font-family: 'Raleway', sans-serif;
+}
+
+#current-degree {
+  display: flex;
+  justify-content: space-between;
+  font-size: 4em;
+}
+
+#narrative {
+  margin-top: 2em;
+  font-size: 1.5em;
+  height: 20vh;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+#img {
+  border: .01em solid white;
+  height: 10em;
+  width: 15em;
+  margin: 1em;
 }

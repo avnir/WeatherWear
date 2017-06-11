@@ -113,7 +113,10 @@ class HealthBot {
                     return Promise.resolve({
                         conversationResponse: conversationResponse,
                         text: reply.reply,
-                        products: reply.products
+                        products: reply.products,
+                        city: reply.city,
+                        temp: reply.temp,
+                        narative: reply.narative
                     });
                 }
                 else {
@@ -285,6 +288,8 @@ class HealthBot {
                     }
 
                     params.query = query;
+                    params.temp = temp;
+                    params.narative = phrase;
 
                     // let products = '';
                     getGoodzer(params, function(error, products) {
@@ -293,7 +298,7 @@ class HealthBot {
 
                         let recommdations = prd + "<hr>" + prd2
 
-                        resolve({'reply':reply, 'products': recommdations });
+                        resolve({'reply':reply, 'city': params.location, 'temp': params.temp, 'narative': params.narative, 'products': recommdations });
                     });
 
                     // console.log("product outside " + prd);

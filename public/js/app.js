@@ -12,7 +12,10 @@ require(['vue'], function(Vue) {
             messages: [],
             awaitingResponse: false,
             markdownConverter: new showdown.Converter(),
-            product: ''
+            product: '',
+            city: '',
+            temp: '',
+            narative: ''
         },
         methods: {
             submitMessage: function() {
@@ -125,9 +128,11 @@ require(['vue'], function(Vue) {
                         var data = JSON.parse(evt.data);
                         // console.log('data .... ' + evt.data);
                         if (data.type == 'msg') {
-                            console.log(data.products);
                             if (data.products) {
                                 app.product = data.products;
+                                app.city = data.city;
+                                app.temp = data.temp;
+                                app.narative = data.narative;
                             }
                             app.addMessage({
                                 isBot: true,

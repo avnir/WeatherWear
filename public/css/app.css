@@ -53,9 +53,9 @@ html, body {
   height: 100%;
   width: 100% padding: 0px;
   margin: 0px;
-  background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), url("https://i.ytimg.com/vi/v1SabYdIlZI/maxresdefault.jpg");
+  background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6));
   background-size: cover;
-  opacity: .5
+  opacity: .9
 }
 
 span#logo {
@@ -75,19 +75,19 @@ span#logo {
 
 .degree {
   color: black;
-  opacity: .8;
-  padding: 3em;
+  opacity: 1;
+  
 }
 
 #city {
-  font-size: 7em;
+  font-size: 4em;
   font-family: 'Raleway', sans-serif;
 }
 
 #current-degree {
   display: flex;
   justify-content: space-between;
-  font-size: 4em;
+  font-size: 2em;
 }
 
 #narrative {

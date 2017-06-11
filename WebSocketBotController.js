@@ -52,6 +52,9 @@ class WebSocketBotController {
                         type: 'msg',
                         text: reply.text,
                         products: reply.products,
+                        narative: reply.narative,
+                        temp: reply.temp,
+                        city: reply.city,
                         watsonData: reply.conversationResponse
                     };
                     client.send(replyMsg);

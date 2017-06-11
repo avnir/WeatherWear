@@ -22,9 +22,11 @@
 </head>
 <body>
 
+<span id="logo">WW</span>
+
 <div id="app" class="container-fluid">
     <div class="row" style="height: 100%">
-        <div class="chat-outer-container col-md-7 col-sm-12">
+        <div class="chat-outer-container col-md-5 col-sm-12">
             <div class="chat-inner-container">
                 <div id="chat-message-container">
                     <div v-for="msg in messages" v-bind:class="[msg.isBot ? 'chat-msg-body-bot' : 'chat-msg-body-user']">
@@ -43,8 +45,24 @@
                 </div>
             </div>
         </div>
-        <div class="editor-container col-sm-5 hidden-sm-down">
-            <div v-html="product"></div>
+
+
+        <div class="editor-container col-sm-7 hidden-sm-down">
+
+          <div class="row degree">
+            <div class="col-12">
+              <div>Here are some items to purchase based on the current weather in {{ city }}</div>
+            </div>
+          </div>
+
+          <div class="container">
+            <div class="row">
+             <div v-html="product" id="img"></div>    
+            </div>
+          </div>
+           
+
+           </div> 
             <div id="editor" class="invisible"></div>
         </div>
     </div>

@@ -24,8 +24,7 @@ function executeRequest(urlString, callback) {
 
 function getWeatherInfo(params, callback) {
   const urlString = "http://api.weather.com/v1/geocode/"+params["long"]+"/"+params["lati"]+"/forecast/daily/5day.json?apiKey=f43934a981fc48f5926e5929d3ee0760&units=e";
-  // console.log(urlString);
-  // console.log(executeRequest(urlString, callback));
+
   return executeRequest(urlString, callback);
 }
  
@@ -179,8 +178,6 @@ class HealthBot {
             reply += conversationResponse.output.text[i] + '\n';
 
         }
-        console.log(conversationResponse.output.text);
-        // console.log(reply);
         return Promise.resolve(reply);
     }
 
@@ -202,19 +199,16 @@ class HealthBot {
                 location += conversationResponse.entities[0].value;
             }
         }
-        // return Promise.resolve(executeRequest(urlString, callback));
 
         return new Promise((resolve, reject) => {
             var long;
             var lati;
-            switch(location) {
-                case "Seatle":
-                case "seatle":
+            switch(location.toLowerCase()) {
+                case "san francisco":
                     long = "47.4444";
                     lati = "-122.3139";
                 break;
 
-                case "Miami":
                 case "miami":
                     long = "25.7906";
                     lati = "-80.3164";
@@ -232,19 +226,21 @@ class HealthBot {
                 "lati": lati
             };
 
-            var output = getWeatherInfo(params, function(errors, weather) {
-                console.log(weather.response.weather);
-                return JSON.parse(weather);
+            getWeatherInfo(params, function(error, venues) {
+                let reply = '';
+                if (error) {
+                    console.log(error);
+                    reply = 'Sorry, I couldn\'t find that city.';
+                }
+                else {
+                    if (venues.forecasts[0].day) {
+                        reply = "Temperature today in "+ params.location +" is "+venues.forecasts[0].day.temp_phrase;
+                    } else {
+                        reply = "Temperature tonight in "+ params.location +" is "+venues.forecasts[0].night.temp_phrase;
+                    }
+                }
+                resolve(reply);
             });
-
-            // console.log(output);
-            // var weatherResponse = JSON.parse(output);
-                // console.log(weatherResponse);
-                // console.log(errors);
-                // colsole.log(weatherResponse);
-
-
-                resolve("ready");
         });
     }
 

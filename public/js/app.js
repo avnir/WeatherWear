@@ -2,7 +2,7 @@ require(['vue'], function(Vue) {
     var app = new Vue({
         el: '#app',
         data: {
-            botName: 'bot',
+            botName: 'Weather Wear',
             userId: null,
             webSocketProtocol: webSocketProtocol,
             webSocket: null,
@@ -11,7 +11,8 @@ require(['vue'], function(Vue) {
             message: '',
             messages: [],
             awaitingResponse: false,
-            markdownConverter: new showdown.Converter()
+            markdownConverter: new showdown.Converter(),
+            product: 0
         },
         methods: {
             submitMessage: function() {
@@ -45,6 +46,14 @@ require(['vue'], function(Vue) {
                     user: app.botName,
                     ts: new Date(),
                     msg: app.markdownConverter.makeHtml('Sorry, you are not connected! I can\'t help you right now :(')
+                });
+            },
+            showInitialMessage: function() {
+                app.addMessage({
+                    isBot: true,
+                    user: app.botName,
+                    ts: new Date(),
+                    msg: app.markdownConverter.makeHtml('Hello. What city would you like to see the weather for?')
                 });
             },
             scrollMessagesToBottom() {
@@ -85,6 +94,7 @@ require(['vue'], function(Vue) {
                 }
                 // configure markdown->html converter
                 app.markdownConverter.setOption('simpleLineBreaks', true);
+                app.showInitialMessage();
                 // set timer to periodically check the web socket connection
                 setTimeout(app.onTimer, 1);
                 // register with window onresize event
@@ -106,29 +116,43 @@ require(['vue'], function(Vue) {
                     let webSocketUrl = app.webSocketProtocol + window.location.host;
                     app.webSocket = new WebSocket(webSocketUrl);
                     app.webSocket.onopen = function() {
-                        console.log('Web socket connected.');
+                        // console.log('Web socket connected.');
                         app.webSocketConnected = true;
                     };
                     app.webSocket.onmessage = function(evt)  {
                         app.awaitingResponse = false;
                         app.webSocketConnected = true;
                         var data = JSON.parse(evt.data);
+                        // console.log('data .... ' + evt.data);
                         if (data.type == 'msg') {
-                            console.log('Received message.');
+                            // console.log('Received message.');
+                            if (data.product) {
+                                app.product = data.product;
+                            }
+                            
+                            // var re = /invisible/gi;
+                            // if ( data.text.search(re) !== -1 ){
+                            //     var message = data.text.split('<hr>');
+                            //     // console.log(message[0]);
+                            //     data.text = message[0]
+                            //     data.watsonData = message[1]
+                            //     // console.log(message[1]);
+                            // }
                             app.addMessage({
                                 isBot: true,
                                 user: app.botName,
                                 ts: new Date(),
                                 msg: app.markdownConverter.makeHtml(data.text)
                             });
-                            editor.setValue(JSON.stringify(data.watsonData,null,3));
+                            // editor.setValue(JSON.stringify(data.watsonData,null,3));
+                            // editor.setValue(data.watsonData);
                         }
                         else if (data.type == 'ping') {
-                            console.log('Received ping.');
+                            // console.log('Received ping.');
                         }
                     };
                     app.webSocket.onclose = function() {
-                        console.log('Websocket closed.');
+                        // console.log('Websocket closed.');
                         if (app.webSocketConnected) {
                             app.offlineStep = 0;
                         }

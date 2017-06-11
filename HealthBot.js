@@ -23,8 +23,29 @@ function executeRequest(urlString, callback) {
 }
 
 function getWeatherInfo(params, callback) {
-  const urlString = "http://api.weather.com/v1/geocode/"+params["long"]+"/"+params["lati"]+"/forecast/daily/5day.json?apiKey=f43934a981fc48f5926e5929d3ee0760&units=e";
+  // const urlString = "http://api.weather.com/v1/geocode/"+params["long"]+"/"+params["lati"]+"/forecast/daily/5day.json?apiKey=f43934a981fc48f5926e5929d3ee0760&units=e";
+  var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
 
+    var yyyy = today.getFullYear();
+    if(dd<10){
+        dd='0'+dd;
+    } 
+    if(mm<10){
+        mm='0'+mm;
+    } 
+    var today = yyyy + mm + dd;
+  // 20170611
+  const urlString = "http://api.weather.com/v1/geocode/"+params["long"]+"/"+params["lati"]+"/observations/historical.json?apiKey=f43934a981fc48f5926e5929d3ee0760&units=e&startDate="+today;
+
+  return executeRequest(urlString, callback);
+}
+
+function getGoodzer(params, callback) {
+  const urlString = "https://api.goodzer.com/products/v0.1/search_stores/?query="+params["query"]+"&lat="+params["lati"]+"&lng="+params["long"]+"&radius=20&priceRange=30:120&apiKey=da92d3df8fd61d84e7fabcafb156c1c4";
+
+console.log(urlString);
   return executeRequest(urlString, callback);
 }
  
@@ -87,7 +108,16 @@ class HealthBot {
                 return this.updateUserWithWatsonConversationContext(user, conversationResponse.context);
             })
             .then((u) => {
-                return Promise.resolve({conversationResponse: conversationResponse, text:reply});
+                if (reply.products) {
+                    return Promise.resolve({
+                        conversationResponse: conversationResponse,
+                        text: reply.reply,
+                        product: reply.products
+                    });
+                }
+                else {
+                    return Promise.resolve({conversationResponse: conversationResponse, text:reply});
+                }
             })
             .catch((error) => {
                 console.log(`Error: ${JSON.stringify(error,null,2)}`);
@@ -205,7 +235,7 @@ class HealthBot {
             var lati;
             switch(location.toLowerCase()) {
                 case "san francisco":
-                    long = "47.4444";
+                    long = "37.7749";
                     lati = "-122.3139";
                 break;
 
@@ -226,20 +256,42 @@ class HealthBot {
                 "lati": lati
             };
 
-            getWeatherInfo(params, function(error, venues) {
+            getWeatherInfo(params, function(error, weather) {
                 let reply = '';
                 if (error) {
                     console.log(error);
                     reply = 'Sorry, I couldn\'t find that city.';
                 }
                 else {
-                    if (venues.forecasts[0].day) {
-                        reply = "Temperature today in "+ params.location +" is "+venues.forecasts[0].day.temp_phrase;
-                    } else {
-                        reply = "Temperature tonight in "+ params.location +" is "+venues.forecasts[0].night.temp_phrase;
+                    let temp = weather.observations[2].temp
+                    let phrase = weather.observations[2].wx_phrase
+                    reply = "Temperature today in " + params.location +" is " + temp +" " + phrase;
+                    let query = '';
+                    switch(phrase.toLowerCase()) {
+                        case (phrase.match(/^Partly Cloudy/) || {}).input:
+                            query = 'sandals';
+                            console.log("Partly Cloudy")
+                        break;
+
+                        case (phrase.match(/^Cloudy/) || {}).input:
+                            query = 'jacket';
+                            console.log("Cloudy")
+                        break;
+
+                        default:
+                            query = 'hat';
+                            console.log("Haze")
+                        break;
                     }
+
+                    params.query = query;
+                    getGoodzer(params, function(error, products) {
+                        console.log("products " + products.stores[0]);
+                        console.log("products " + products.stores[0].products[0].title);
+                    });
                 }
-                resolve(reply);
+
+                resolve({'reply':reply, 'products':"<span style=\"color:red;\">Our product recommendations</span>"});
             });
         });
     }

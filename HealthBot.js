@@ -2,6 +2,32 @@
 
 const ConversationV1 = require('watson-developer-cloud/conversation/v1');
 const Foursquare = require('foursquarevenues');
+
+const request = require('request');
+const querystring = require('querystring');
+
+function handleRes(error, res, body, callback) {
+  if (error) {
+    return callback(error, null);
+  } else if (res.statusCode >= 300) {
+    return callback(body, null);
+  } else {
+    return callback(null, JSON.parse(body));
+  }
+};
+
+function executeRequest(urlString, callback) {
+  return request(urlString, (error, response, body) => {
+    return handleRes(error, response, body, callback);
+  });
+}
+
+function getWeatherInfo(params, callback) {
+  const urlString = "http://api.weather.com/v1/geocode/"+params["long"]+"/"+params["lati"]+"/forecast/daily/5day.json?apiKey=f43934a981fc48f5926e5929d3ee0760&units=e";
+  // console.log(urlString);
+  // console.log(executeRequest(urlString, callback));
+  return executeRequest(urlString, callback);
+}
  
 class HealthBot {
 
@@ -121,8 +147,8 @@ class HealthBot {
                 // to process the wrong action if we forget to overwrite it, so here we clear the action in the context
                 conversationResponse.context.action = null;
                 // Process the action
-                if (action == "findDoctorByLocation") {
-                    return this.handleFindDoctorByLocationMessage(conversationResponse);
+                if (action == "findWeatherByLocation") {
+                    return this.findWeatherByLocation(conversationResponse);
                 }
                 else {
                     return this.handleDefaultMessage(conversationResponse);
@@ -151,27 +177,21 @@ class HealthBot {
         let reply = '';
         for (let i = 0; i < conversationResponse.output.text.length; i++) {
             reply += conversationResponse.output.text[i] + '\n';
+
         }
+        console.log(conversationResponse.output.text);
+        // console.log(reply);
         return Promise.resolve(reply);
     }
 
     /**
-     * The handler for the findDoctorByLocation action defined in the Watson Conversation dialog.
+     * The handler for the findWeatherByLocation action defined in the Watson Conversation dialog.
      * Queries Foursquare for doctors based on the speciality identified by Watson Conversation
      * and the location entered by the user.
      * @param {object} conversationResponse - The response from Watson Conversation
      * @returns {Promise.<string|error>} - The reply to send to the user if fulfilled, or an error if rejected
      */
-    handleFindDoctorByLocationMessage(conversationResponse) {
-        if (! this.foursquareClient) {
-            return Promise.resolve('Please configure Foursquare.');
-        }
-        // Get the specialty from the context to be used in the query to Foursquare
-        let query = '';
-        if (conversationResponse.context.specialty) {
-            query += conversationResponse.context.specialty + ' ';
-        }
-        query += 'Doctor';
+    findWeatherByLocation(conversationResponse) {
         // Get the location entered by the user to be used in the query
         let location = '';
         for (let i=0; i<conversationResponse.entities.length; i++) {
@@ -182,32 +202,53 @@ class HealthBot {
                 location += conversationResponse.entities[0].value;
             }
         }
+        // return Promise.resolve(executeRequest(urlString, callback));
+
         return new Promise((resolve, reject) => {
+            var long;
+            var lati;
+            switch(location) {
+                case "Seatle":
+                case "seatle":
+                    long = "47.4444";
+                    lati = "-122.3139";
+                break;
+
+                case "Miami":
+                case "miami":
+                    long = "25.7906";
+                    lati = "-80.3164";
+                break;
+
+                default:
+                    long = "39.8328";
+                    lati = "-104.6575";
+                break;
+            }
+
             let params = {
-                "query": query,
-                "near": location,
-                "radius": 5000
+                "location": location,
+                "long": long,
+                "lati": lati
             };
-            this.foursquareClient.getVenues(params, function(error, venues) {
-                let reply = '';
-                if (error) {
-                    console.log(error);
-                    reply = 'Sorry, I couldn\'t find the weather for that city.';
-                }
-                else {
-                    console.log(params.location);
-                    reply = 'Here is what I found:\n';
-                    for (var i=0; i<venues.response.venues.length; i++) {
-                        if (reply.length > 0) {
-                            reply += '\n';
-                        }
-                        reply += '* ' + venues.response.venues[i].name;
-                    }
-                }
-                resolve(reply);
+
+            var output = getWeatherInfo(params, function(errors, weather) {
+                console.log(weather.response.weather);
+                return JSON.parse(weather);
             });
+
+            // console.log(output);
+            // var weatherResponse = JSON.parse(output);
+                // console.log(weatherResponse);
+                // console.log(errors);
+                // colsole.log(weatherResponse);
+
+
+                resolve("ready");
         });
     }
+
+    
 
     /**
      * Retrieves the user doc stored in the Cloudant database associated with the current user interacting with the bot.
